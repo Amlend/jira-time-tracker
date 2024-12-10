@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  org_id        Int         @id @default(autoincrement())
+  name          String?
+  shared_secret String?
+  client_key    String      @unique
+  base_url      String?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  deleted_at    DateTime?
+  projects      Project[]
+  tasks         Task[]
+  timeEntries   TimeEntry[]
+  users         User[]
+}
+
+model User {
+  user_id        Int           @id @default(autoincrement())
+  user_source_id String        
+  org_id         Int?
+  username       String?
+  email          String?
+  photo_url      String?
+  password_hash  String?
+  role_id        Int?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  deleted_at     DateTime?
+  timeEntries    TimeEntry[]
+  @@unique([user_source_id, org_id])
+  organization   Organization? @relation(fields: [org_id], references: [org_id], onDelete: Cascade)
+  role           Role?         @relation(fields: [role_id], references: [role_id])
+}
+
+model Role {
+  role_id         Int              @id @default(autoincrement())
+  role_name       String           @unique
+  rolePermissions RolePermission[]
+  users           User[]
+}
+
+model Permission {
+  permission_id   Int              @id @default(autoincrement())
+  permission_name String           @unique
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  role_id       Int
+  permission_id Int
+  permission    Permission @relation(fields: [permission_id], references: [permission_id], onDelete: Cascade)
+  role          Role       @relation(fields: [role_id], references: [role_id], onDelete: Cascade)
+
+  @@id([role_id, permission_id])
+}
+
+model Task {
+  task_id           Int           @id @default(autoincrement())
+  task_source_id    String
+  org_id            Int?
+  project_id        Int?
+  task_link         String?
+  estimated_minutes Int?
+  task_key          String?
+  title             String?
+  icon              String?
+  organization      Organization? @relation(fields: [org_id], references: [org_id])
+  project           Project?      @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  timeEntries       TimeEntry[]
+}
+
+model Project {
+  project_id        Int           @id @default(autoincrement())
+  project_source_id String
+  org_id            Int?
+  project_link      String?
+  name              String?
+  project_key       String?
+  organization      Organization? @relation(fields: [org_id], references: [org_id], onDelete: Cascade)
+  tasks             Task[]
+  timeEntries       TimeEntry[]
+}
+
+model TimeEntry {
+  time_entry_id Int           @id @default(autoincrement())
+  source_entry_id String?
+  org_id        Int?
+  user_id       Int?
+  task_id       Int?
+  project_id    Int?
+  minutes       Int
+  entry_time    DateTime
+  notes         String?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  organization  Organization? @relation(fields: [org_id], references: [org_id])
+  project       Project?      @relation(fields: [project_id], references: [project_id])
+  task          Task?         @relation(fields: [task_id], references: [task_id], onDelete: Cascade)
+  user          User?         @relation(fields: [user_id], references: [user_id])
+}

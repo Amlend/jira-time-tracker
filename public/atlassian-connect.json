@@ -1,0 +1,90 @@
+{
+  "name": "Timesheets by Appforest",
+  "description": "Time tracker plugin",
+  "key": "com.appforest.jira.plugins.timesheets",
+  "scopes": ["READ", "WRITE", "ACT_AS_USER"],
+  "baseUrl": "https://timesheet-app-six.vercel.app/",
+  "enableLicensing": true,
+  "enableFeatureFlags": true,
+  "debug": true,
+  "vendor": {
+    "name": "Appforest",
+    "url": "https://www.appforest.io"
+  },
+  "authentication": {
+    "type": "jwt"
+  },
+  "lifecycle": {
+    "installed": "/api/installed",
+    "uninstalled": "/api/uninstalled"
+  },
+  "apiVersion": 1,
+  "modules": {
+    "jiraTimeTrackingProviders": [
+      {
+        "name": {
+          "value": "Appforest Time Tracker"
+        },
+        "key": "appforest-time-tracking",
+        "conditions": [
+          {
+            "condition": "appforest_time_tracking_provider_enabled",
+            "params": {
+              "addonKey": "com.appforest.jira.plugins.timesheets",
+              "moduleKey": "appforest-time-tracking"
+            }
+          }
+        ]
+      }
+    ],
+    "jiraIssueContexts": [
+      {
+        "icon": {
+          "width": 0,
+          "height": 0,
+          "url": "/assets/media/logos/appforest-logo.png"
+        },
+        "content": {
+          "type": "label",
+          "label": {
+            "value": "Open Appforest"
+          }
+        },
+        "target": {
+          "type": "web_panel",
+          "url": "/"
+        },
+        "jiraNativeAppsEnabled": true,
+        "name": {
+          "value": "Appforest"
+        },
+        "key": "timesheet-issue-context-panel"
+      }
+    ],
+    "dialogs": [
+      {
+        "key": "log-hours-dialog",
+        "url": "/log-hours-dialog",
+        "options": {
+          "width": "80%",
+          "height": "80%",
+          "chrome": false
+        }
+      }
+    ],
+    "generalPages": [
+      {
+        "url": "/logs",
+        "icon": {
+          "width": 80,
+          "height": 80,
+          "url": "/assets/media/logos/appforest-logo.png"
+        },
+        "name": {
+          "value": "Appforest"
+        },
+        "key": "appforest-general-page"
+      }
+    ]
+  }
+}
